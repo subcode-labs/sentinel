@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](#)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](#)
-[![GitHub Stars](https://img.shields.io/github/stars/subcode-ventures/sentinel?style=social)](#)
+[![GitHub Stars](https://img.shields.io/github/stars/subcode-labs/sentinel?style=social)](#)
 
 **Secure Secret Management for AI Agents**
 
@@ -39,7 +39,7 @@ Sentinel makes it safe to give your AI agents the keys to the kingdom.
 
 ```bash
 # Clone the repository
-git clone https://github.com/subcode-ventures/sentinel.git
+git clone https://github.com/subcode-labs/sentinel.git
 cd sentinel
 
 # Install dependencies (requires Bun)
@@ -166,6 +166,13 @@ Customize policies in your deployment to match your security requirements.
 - [ ] Role-based access control (RBAC)
 - [ ] Request templates and presets
 
+## Framework Integrations
+
+See the [`examples/`](./examples) directory for ready-to-use integrations with popular AI agent frameworks:
+
+- **LangChain**: [LangChain + Sentinel Example](./examples/langchain)
+- **CrewAI**: [CrewAI + Sentinel Example](./examples/crewai)
+
 ## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
@@ -182,8 +189,8 @@ Sentinel is open source software licensed under the [MIT License](LICENSE).
 
 ## Community & Support
 
-- **Issues**: [GitHub Issues](https://github.com/subcode-ventures/sentinel/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/subcode-ventures/sentinel/discussions)
+- **Issues**: [GitHub Issues](https://github.com/subcode-labs/sentinel/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/subcode-labs/sentinel/discussions)
 - **Security**: See [SECURITY.md](SECURITY.md) for reporting vulnerabilities
 
 ## Enterprise & Cloud
@@ -198,7 +205,7 @@ Looking for a hosted solution with advanced features?
 - SLA guarantees
 - Priority support
 
-Learn more at [sentinel.subcode.ventures](https://sentinel.subcode.ventures)
+Learn more at [sentinel.subcode.labs](https://sentinel.subcode.labs)
 
 ---
 

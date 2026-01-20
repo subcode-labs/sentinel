@@ -23,7 +23,7 @@ This project adheres to a code of conduct that emphasizes respect, collaboration
 
 ### Reporting Bugs
 
-Bugs are tracked as [GitHub Issues](https://github.com/subcode-ventures/sentinel/issues). Before creating a new issue:
+Bugs are tracked as [GitHub Issues](https://github.com/subcode-labs/sentinel/issues). Before creating a new issue:
 
 1. **Search existing issues** to avoid duplicates
 2. **Use the bug report template** provided
@@ -269,7 +269,7 @@ sentinel/
 
 If you have questions about contributing:
 
-- Check existing [GitHub Discussions](https://github.com/subcode-ventures/sentinel/discussions)
+- Check existing [GitHub Discussions](https://github.com/subcode-labs/sentinel/discussions)
 - Open a new discussion
 - Reach out to maintainers in your PR
 

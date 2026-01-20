@@ -66,4 +66,4 @@ None - this is the initial release.
 
 ---
 
-For detailed commit history, see [GitHub Releases](https://github.com/subcode-ventures/sentinel/releases).
+For detailed commit history, see [GitHub Releases](https://github.com/subcode-labs/sentinel/releases).

@@ -125,7 +125,7 @@ Edit `styles.css` for visual changes:
 
 Update these placeholder links:
 
-1. GitHub repo URL: `https://github.com/subcode-ventures/sentinel`
+1. GitHub repo URL: `https://github.com/subcode-labs/sentinel`
 2. Cloud signup: Change `#contact` to actual signup URL
 3. Sales email: `sales@subcode.ventures`
 4. Documentation: Link to actual docs site
