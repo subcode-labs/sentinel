@@ -104,7 +104,7 @@ Current implementation has the following security limitations:
 
 ### Development Version
 
-- **Hardcoded API token**: `sentinel_dev_key` is not secure for production
+- **Default API token**: Uses `sentinel_dev_key` by default (override with `SENTINEL_API_KEY`)
 - **HTTP only**: No built-in HTTPS support (use reverse proxy)
 - **Mock policy engine**: Simple string-matching policies (extend for production)
 - **No secret encryption**: Secrets stored in plaintext in DB (use encrypted volumes)

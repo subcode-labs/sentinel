@@ -2,7 +2,8 @@ import { Database } from "bun:sqlite";
 import { join } from "node:path";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
-import type { AccessRequest, AccessResponse, AccessStatus } from "./types";
+import { z } from "zod";
+import type { AccessResponse, AccessStatus } from "./types";
 
 const app = new Hono();
 
@@ -57,14 +58,43 @@ function getOrCreateSecret(resourceId: string): {
 }
 
 // Secret key for dev
-const API_TOKEN = "sentinel_dev_key";
+const API_TOKEN = process.env.SENTINEL_API_KEY || "sentinel_dev_key";
+
+if (process.env.NODE_ENV !== "test" && API_TOKEN === "sentinel_dev_key") {
+  console.warn(
+    "WARNING: Running with default insecure API token 'sentinel_dev_key'. Set SENTINEL_API_KEY for production.",
+  );
+}
 
 // Middleware: Logger & Auth
 app.use("/v1/*", bearerAuth({ token: API_TOKEN }));
 
+const AccessIntentSchema = z.object({
+  summary: z.string(),
+  description: z.string(),
+  task_id: z.string(),
+});
+
+const AccessRequestSchema = z.object({
+  agent_id: z.string(),
+  resource_id: z.string(),
+  intent: AccessIntentSchema,
+  ttl_seconds: z.number().positive(),
+});
+
 app.post("/v1/access/request", async (c) => {
   try {
-    const body = await c.req.json<AccessRequest>();
+    const rawBody = await c.req.json();
+    const validation = AccessRequestSchema.safeParse(rawBody);
+
+    if (!validation.success) {
+      return c.json(
+        { error: "Invalid Request", details: validation.error },
+        400,
+      );
+    }
+
+    const body = validation.data;
     const requestId = `req_${Math.random().toString(36).substring(2, 9)}`;
     const now = new Date().toISOString();
 
