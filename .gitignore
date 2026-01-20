@@ -61,3 +61,4 @@ Thumbs.db
 # Eval runs and workspaces
 eval_runs/
 workspaces/
+__pycache__/

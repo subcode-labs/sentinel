@@ -48,7 +48,7 @@ class SentinelClient:
         self.headers = {
             "Authorization": f"Bearer {api_token}",
             "Content-Type": "application/json",
-            "User-Agent": f"SentinelPythonSDK/0.1.0 Agent/{agent_id}",
+            "User-Agent": f"SentinelPythonSDK/0.1.1 Agent/{agent_id}",
         }
 
     def request_secret(
