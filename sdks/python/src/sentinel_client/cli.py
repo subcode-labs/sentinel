@@ -23,6 +23,9 @@ def main():
         "--intent", "-i", default="CLI Access", help="Reason for access"
     )
     get_parser.add_argument(
+        "--version", "-v", type=int, help="Specific version to request"
+    )
+    get_parser.add_argument(
         "--ttl", type=int, default=3600, help="Time-to-live in seconds"
     )
     get_parser.add_argument(
@@ -97,7 +100,11 @@ def main():
             print(f"Requesting access to '{args.resource_id}'...", file=sys.stderr)
 
             secret = client.request_secret(
-                resource_id=args.resource_id, intent=intent, ttl_seconds=args.ttl
+                resource_id=args.resource_id,
+                intent=intent,
+                version=args.version,
+                environment=args.environment,
+                ttl_seconds=args.ttl,
             )
 
             if args.format == "json":
@@ -126,7 +133,7 @@ def main():
         )
 
         try:
-            resources = client.list_resources()
+            resources = client.list_resources(environment=args.environment)
 
             if args.format == "json":
                 print(json.dumps(resources, indent=2))
@@ -166,7 +173,7 @@ def main():
         try:
             # Fetch secrets
             print("Fetching secrets from Sentinel...", file=sys.stderr)
-            secrets = client.fetch_secrets()
+            secrets = client.fetch_secrets(environment=args.environment)
 
             # Prepare environment
             env = os.environ.copy()
