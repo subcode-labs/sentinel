@@ -4,6 +4,10 @@
   "description": "Secure secret management for AI agents with intent-based access control",
   "main": "src/server.ts",
   "type": "module",
+  "exports": {
+    ".": "./src/server.ts",
+    "./types": "./src/types.ts"
+  },
   "scripts": {
     "start": "bun run src/server.ts",
     "dev": "bun --watch src/server.ts",

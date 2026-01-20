@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { z } from "zod";
+import { adminHtml } from "./admin_ui";
 import type { AccessResponse, AccessStatus } from "./types";
 
 const app = new Hono();
@@ -11,7 +12,7 @@ const app = new Hono();
 const dbPath =
   process.env.NODE_ENV === "test"
     ? ":memory:"
-    : join(import.meta.dir, "../sentinel.db");
+    : process.env.DB_PATH || join(import.meta.dir, "../sentinel.db");
 const db = new Database(dbPath);
 
 // Initialize schema
@@ -69,6 +70,9 @@ if (process.env.NODE_ENV !== "test" && API_TOKEN === "sentinel_dev_key") {
 // Middleware: Logger & Auth
 app.use("/v1/*", bearerAuth({ token: API_TOKEN }));
 
+// Serve Admin Dashboard
+app.get("/admin", (c) => c.html(adminHtml));
+
 const AccessIntentSchema = z.object({
   summary: z.string(),
   description: z.string(),
@@ -124,6 +128,19 @@ app.post("/v1/access/request", async (c) => {
         message: "This resource requires human approval. Check status later.",
         polling_url: `/v1/access/requests/${requestId}`,
       };
+
+      // Notify Admin via Webhook (if configured)
+      const webhookUrl = process.env.SENTINEL_WEBHOOK_URL;
+      if (webhookUrl) {
+        // Fire and forget - don't block the response
+        fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: `🛡️ **Sentinel Access Request**\n\n**Agent:** ${body.agent_id}\n**Resource:** ${body.resource_id}\n**Intent:** ${body.intent.summary}\n\nApprove: ${process.env.SENTINEL_URL || "http://localhost:3000"}/admin`,
+          }),
+        }).catch((e) => console.error("[Webhook] Failed to send notification:", e));
+      }
     } else if (body.resource_id.includes("forbidden")) {
       status = "DENIED";
       response = {
@@ -297,6 +314,14 @@ app.post("/v1/admin/secrets/:resource_id/rotate", (c) => {
     version: newVersion,
     status: "ROTATED",
   });
+});
+
+// List all secrets
+app.get("/v1/admin/secrets", (c) => {
+  const secrets = db
+    .query("SELECT * FROM secrets ORDER BY resource_id ASC, version DESC")
+    .all();
+  return c.json(secrets);
 });
 
 export { app };

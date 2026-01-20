@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Web-based admin dashboard for reviewing requests
 - Custom policy language (Rego or Cedar integration)
 - Multi-user approval workflows
 - Vault backend integration (HashiCorp Vault, AWS Secrets Manager)
@@ -21,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Initial Release** of Sentinel Community Edition
+- **Admin Dashboard**: Built-in web UI (`/admin`) for reviewing requests
 - REST API server with Hono framework
 - Intent-based access request system
 - SQLite persistence layer

@@ -1,15 +1,12 @@
 import os
 import sys
 from crewai import Agent, Task, Crew
-
-# Add parent directory to path so we can import sentinel_utils
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sentinel_utils import SentinelClient
+from sentinel_client import SentinelClient, AccessIntent, SentinelDeniedError
 
 # Initialize Sentinel Client
 sentinel = SentinelClient(
-    base_url="http://localhost:3000",
-    api_token="sentinel_dev_key",
+    base_url=os.getenv("SENTINEL_URL", "http://localhost:3000"),
+    api_token=os.getenv("SENTINEL_TOKEN", "sentinel_dev_key"),
     agent_id="crewai-agent",
 )
 
@@ -17,21 +14,23 @@ sentinel = SentinelClient(
 def request_secret(resource_name: str) -> str:
     """Helper to request a secret and handle the response."""
     print(f"[*] Requesting secret: {resource_name}...")
-    result = sentinel.request_with_polling(
-        resource_id=resource_name,
-        intent={
-            "task_id": "crewai-demo-1",
-            "summary": "CrewAI secure action",
-            "description": f"Agent needs {resource_name} to perform a secure operation",
-        },
-    )
+    try:
+        intent = AccessIntent(
+            summary="CrewAI secure action",
+            description=f"Agent needs {resource_name} to perform a secure operation",
+            task_id="crewai-demo-1",
+        )
 
-    if result["status"] == "APPROVED":
+        # request_secret handles polling automatically
+        secret = sentinel.request_secret(resource_id=resource_name, intent=intent)
+
         print(f"[+] Access granted for {resource_name}")
-        return result["secret"]["value"]
-    else:
-        reason = result.get("reason", "Access denied by policy")
-        raise RuntimeError(f"Sentinel Access Denied: {reason}")
+        return secret.value
+
+    except SentinelDeniedError as e:
+        raise RuntimeError(f"Sentinel Access Denied: {e}")
+    except Exception as e:
+        raise RuntimeError(f"Failed to get secret: {e}")
 
 
 def secure_action():
@@ -67,8 +66,10 @@ if __name__ == "__main__":
 
     # Note: In a real CrewAI setup, you'd wrap secure_action in a @tool
 
-    crew = Crew(agents=[agent], tasks=[task], verbose=True)
+    # We monkey-patch the task execution for this demo since we aren't using the full Tool definition
+    # In a real app, you would define secure_action as a Tool.
+    print("[*] Simulating agent execution calling the secure tool...")
+    result_text = secure_action()
 
-    result = crew.kickoff()
     print("\nFinal Result:")
-    print(result)
+    print(result_text)

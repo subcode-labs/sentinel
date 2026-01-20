@@ -3,15 +3,13 @@ import sys
 from langchain.agents import Tool, AgentExecutor, create_react_agent
 from langchain_openai import ChatOpenAI
 from langchain import hub
-
-# Add parent directory to path so we can import sentinel_utils
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from sentinel_utils import SentinelClient
+from sentinel_client import SentinelClient, AccessIntent, SentinelDeniedError
 
 # Initialize Sentinel Client
+# In a real app, these would come from env vars
 sentinel = SentinelClient(
-    base_url="http://localhost:3000",
-    api_token="sentinel_dev_key",
+    base_url=os.getenv("SENTINEL_URL", "http://localhost:3000"),
+    api_token=os.getenv("SENTINEL_TOKEN", "sentinel_dev_key"),
     agent_id="langchain-agent",
 )
 
@@ -21,23 +19,27 @@ def get_secure_key(resource_id: str) -> str:
     Fetches a sensitive key from Sentinel with intent logging.
     In a real app, this would be called inside a Tool's _run method.
     """
-    result = sentinel.request_with_polling(
-        resource_id=resource_id,
-        intent={
-            "task_id": "langchain-agent-task",
-            "summary": "LangChain tool execution",
-            "description": f"Agent needs {resource_id} to interact with a protected service",
-        },
-    )
+    try:
+        intent = AccessIntent(
+            summary="LangChain tool execution",
+            description=f"Agent needs {resource_id} to interact with a protected service",
+            task_id="langchain-agent-task",
+        )
 
-    if result["status"] == "APPROVED":
-        return result["secret"]["value"]
-    else:
-        raise Exception(f"Sentinel denied access to {resource_id}")
+        # request_secret handles polling automatically if the request is PENDING_APPROVAL
+        secret = sentinel.request_secret(resource_id=resource_id, intent=intent)
+        return secret.value
+
+    except SentinelDeniedError as e:
+        raise Exception(f"Sentinel denied access to {resource_id}: {e}")
+    except Exception as e:
+        raise Exception(f"Failed to retrieve secret for {resource_id}: {e}")
 
 
 def github_search(query: str) -> str:
     """A mock tool that requires a secret from Sentinel."""
+    print(f"[*] Tool requesting access to 'github_api_token'...")
+    # This call will block until approved if a human review is required
     api_key = get_secure_key("github_api_token")
     return f"Results for '{query}' using key {api_key[:4]}***"
 
@@ -60,8 +62,12 @@ if __name__ == "__main__":
         print(github_search("sentinel repository"))
     else:
         llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+
+        # Get a standard prompt for React agents
         prompt = hub.pull("hwchase17/react")
+
         agent = create_react_agent(llm, tools, prompt)
         agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
+        print("\n[*] Agent Task: 'Search GitHub for the sentinel repository'")
         agent_executor.invoke({"input": "Search GitHub for the sentinel repository"})

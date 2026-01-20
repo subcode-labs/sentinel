@@ -1,0 +1,5 @@
+langchain
+langchain-openai
+crewai
+# Install the local SDK in editable mode
+-e ../sdks/python

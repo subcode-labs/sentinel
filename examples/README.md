@@ -12,52 +12,96 @@ Sentinel provides:
 3. **Human-in-the-loop**: Sensitive requests can be held for human approval.
 4. **Auditability**: Complete logs of all secret access with full context.
 
+## Prerequisites
+
+You need the Sentinel Python SDK (`sentinel-client`) and the respective framework libraries.
+
+1. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+   *Note: This installs the `sentinel-client` SDK from the local `../sdk/python` directory.*
+
+2. **Start Sentinel Server**:
+   Ensure you have the Sentinel server running locally (or set `SENTINEL_URL` to your cloud instance).
+   ```bash
+   cd ../..
+   bun install
+   bun run src/server.ts
+   ```
+
 ## Available Examples
 
 | Framework | Directory | Description |
 |-----------|-----------|-------------|
 | **LangChain** | [`/langchain`](./langchain) | Using Sentinel with LangChain Tools and ReAct agents. |
 | **CrewAI** | [`/crewai`](./crewai) | Integrating Sentinel into CrewAI tasks and agent workflows. |
+| **Vercel AI SDK** | [`/vercel-ai-sdk`](./vercel-ai-sdk) | **(TypeScript)** Integrating Sentinel with Vercel AI SDK Tools. |
+| **Next.js App Router** | [`/nextjs-app-router`](./nextjs-app-router) | **(TypeScript)** Using Sentinel in Server Actions for JIT access. |
 
-## Quick Start (Mock Environment)
+## Running the Examples
 
-To try these examples without a full agent framework setup:
+### Next.js App Router
 
-1. **Start Sentinel Server**:
-   ```bash
-   cd ..
-   bun install
-   bun run src/server.ts
-   ```
+See the [README](./nextjs-app-router/README.md) in the directory for setup instructions. This example requires a Next.js environment to run fully, but demonstrates the code structure.
 
-2. **Run an Example**:
-   ```bash
-   # In another terminal
-   cd examples/langchain
-   python langchain_sentinel.py
-   ```
+### Vercel AI SDK (TypeScript)
 
-## Creating Your Own Integration
+This example shows how to use Sentinel to secure tools in the Vercel AI SDK.
 
-All examples in this directory use `sentinel_utils.py`, a lightweight Python wrapper for the Sentinel REST API. You can copy this file into your project to get started quickly before the official Python SDK is released.
+```bash
+cd vercel-ai-sdk
+# Ensure dependencies are installed
+bun install
+# Run the example
+bun run index.ts
+```
 
-### Basic Pattern
+### LangChain
+
+This example demonstrates a ReAct agent that uses a custom Tool to request a GitHub token from Sentinel.
+
+```bash
+cd langchain
+# Optional: Set OPENAI_API_KEY to run the real agent loop
+export OPENAI_API_KEY=sk-...
+python langchain_sentinel.py
+```
+
+### CrewAI
+
+This example demonstrates a CrewAI agent requesting a production API key as part of a secure task.
+
+```bash
+cd crewai
+python crewai_sentinel.py
+```
+
+## Integration Pattern
+
+The core pattern involves using the `SentinelClient` to request a secret with a specific "intent". If the request requires approval, the SDK handles the polling automatically.
 
 ```python
-from sentinel_utils import SentinelClient
+from sentinel_client import SentinelClient, AccessIntent
 
-client = SentinelClient(base_url="http://localhost:3000", api_token="...", agent_id="...")
-
-result = client.request_with_polling(
-    resource_id="github_token",
-    intent={
-        "task_id": "DEPLOY-123",
-        "summary": "Pushing release tags",
-        "description": "Agent needs to tag the new release on GitHub"
-    }
+client = SentinelClient(
+    base_url="http://localhost:3000",
+    api_token="...",
+    agent_id="my-agent"
 )
 
-if result['status'] == 'APPROVED':
-    secret = result['secret']['value']
-    # Use the secret...
+# 1. Define the intent
+intent = AccessIntent(
+    summary="Pushing release tags",
+    description="Agent needs to tag the new release on GitHub",
+    task_id="DEPLOY-123"
+)
+
+# 2. Request the secret (blocks if pending approval)
+secret = client.request_secret(
+    resource_id="github_token",
+    intent=intent
+)
+
+print(f"Got secret: {secret.value}")
 ```

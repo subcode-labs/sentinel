@@ -255,5 +255,24 @@ describe("Sentinel Server", () => {
       expect(val2).not.toBe(val1);
       expect(val2).toMatch(/^secret_v2_/);
     });
+
+    it("should list all secrets (Admin)", async () => {
+      // Ensure we have secrets
+      await app.request(`/v1/admin/secrets/rotatable_resource/rotate`, {
+        method: "POST",
+        headers: authHeaders,
+      });
+
+      const res = await app.request("/v1/admin/secrets", {
+        headers: authHeaders,
+      });
+
+      expect(res.status).toBe(200);
+      const secrets = (await res.json()) as any[];
+      expect(secrets.length).toBeGreaterThan(0);
+      
+      const resourceSecrets = secrets.filter(s => s.resource_id === "rotatable_resource");
+      expect(resourceSecrets.length).toBeGreaterThanOrEqual(2);
+    });
   });
 });

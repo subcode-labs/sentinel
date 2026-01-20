@@ -2,22 +2,14 @@ version: '3.8'
 
 services:
   sentinel:
-    image: oven/bun:latest
+    build: .
+    image: subcode/sentinel:latest
     container_name: sentinel
-    working_dir: /app
-    command: bun run src/server.ts
     
     ports:
       - "3000:3000"
     
     volumes:
-      # Mount source code
-      - ./src:/app/src:ro
-      
-      # Mount package.json and lock file
-      - ./package.json:/app/package.json:ro
-      - ./bun.lockb:/app/bun.lockb:ro
-      
       # Persistent database volume
       - sentinel-data:/app/data
       
@@ -26,7 +18,7 @@ services:
     
     environment:
       # Server configuration
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3000
       - HOST=0.0.0.0
       

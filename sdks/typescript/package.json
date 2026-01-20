@@ -1,0 +1,38 @@
+{
+  "name": "@subcode/sentinel-client",
+  "version": "0.1.0",
+  "description": "Official TypeScript Client for Sentinel - Secure Secret Management for AI Agents",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "bun test",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "sentinel",
+    "secrets",
+    "security",
+    "ai",
+    "agents",
+    "sdk"
+  ],
+  "author": "SubCode Ventures",
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

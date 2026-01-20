@@ -31,7 +31,7 @@ Sentinel makes it safe to give your AI agents the keys to the kingdom.
 - **REST API**: Simple HTTP interface for any agent platform
 - **TypeScript SDK**: First-class client library included
 - **SQLite Persistence**: Lightweight, zero-config data storage
-- **Admin Dashboard**: Web UI for reviewing and approving requests (coming soon)
+- **Admin Dashboard**: Web UI for reviewing and approving requests (available at `/admin`)
 
 ## Quick Start
 
@@ -82,6 +82,25 @@ if (result.status === 'APPROVED') {
 }
 ```
 
+#### Using Sentinel Cloud
+
+Sentinel Cloud provides a managed secret store for your agents.
+
+```typescript
+import { SentinelClient } from '@subcode/sentinel-client';
+
+const client = new SentinelClient({
+  // Connects to Sentinel Cloud by default
+  apiToken: 'sentinel_sk_...', // Your Project API Key from the Dashboard
+  environment: 'production',   // 'production' | 'staging' | 'dev' | 'test'
+});
+
+// Fetch all secrets for the environment
+const secrets = await client.fetchSecrets();
+
+console.log(secrets['OPENAI_API_KEY']);
+```
+
 #### Using the REST API
 
 ```bash
@@ -99,6 +118,15 @@ curl -X POST http://localhost:3000/v1/access/request \
     "ttl_seconds": 3600
   }'
 ```
+
+### Using the Admin Dashboard
+
+Sentinel comes with a built-in "Overseer" dashboard for managing requests.
+
+1. Start the server (`http://localhost:3000`).
+2. Navigate to `http://localhost:3000/admin`.
+3. Enter your API Key (default: `sentinel_dev_key`) to log in.
+4. View pending requests, approve/deny access, inspect audit logs, and manage secrets (view versions, rotate keys).
 
 ### Docker Setup
 
@@ -119,7 +147,7 @@ Sentinel consists of three main components:
    - Manages secret lifecycle
    - Persists requests in SQLite
 
-2. **Client SDK** (`/sdk`): TypeScript library for agents
+2. **Client SDK** (`sdks/typescript`): TypeScript library for agents
    - Type-safe API client
    - Automatic polling for pending approvals
    - Error handling and retries
@@ -157,7 +185,7 @@ Customize policies in your deployment to match your security requirements.
 
 ## Roadmap
 
-- [ ] Web-based admin dashboard
+- [x] Web-based admin dashboard
 - [ ] Custom policy language (Rego/Cedar)
 - [ ] Multi-user approval workflows
 - [ ] Vault backend integration (HashiCorp Vault, AWS Secrets Manager)
@@ -172,6 +200,8 @@ See the [`examples/`](./examples) directory for ready-to-use integrations with p
 
 - **LangChain**: [LangChain + Sentinel Example](./examples/langchain)
 - **CrewAI**: [CrewAI + Sentinel Example](./examples/crewai)
+- **Next.js App Router**: [Next.js + Sentinel Example](./examples/nextjs-app-router)
+- **Vercel AI SDK**: [Vercel AI SDK + Sentinel Example](./examples/vercel-ai-sdk)
 
 ## Contributing
 
@@ -205,7 +235,8 @@ Looking for a hosted solution with advanced features?
 - SLA guarantees
 - Priority support
 
-Learn more at [sentinel.subcode.labs](https://sentinel.subcode.labs)
+Sign up for the Beta at [sentinel-cloud.vercel.app](https://sentinel-cloud.vercel.app).
+Learn more at [sentinel.subcode.labs](https://sentinel.subcode.labs).
 
 ---
 
