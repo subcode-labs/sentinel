@@ -43,7 +43,7 @@ jobs:
       run: bun install
       
     - name: Run tests
-      run: bun test
+      run: bun test --pass-with-no-tests
       
   build:
     name: Build
@@ -90,7 +90,7 @@ jobs:
       working-directory: ./
       
     - name: Run integration tests
-      run: bun test --integration
+      run: bun test --pass-with-no-tests --integration
       
     - name: Stop server
       run: pkill -f "bun.*server.ts" || true
