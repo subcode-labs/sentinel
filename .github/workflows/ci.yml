@@ -25,7 +25,6 @@ jobs:
       
     - name: Run linter
       run: bun run lint
-      continue-on-error: true
 
   test:
     name: Test
@@ -64,11 +63,9 @@ jobs:
       
     - name: Build project
       run: bun run build
-      continue-on-error: true
       
     - name: Check TypeScript types
       run: bun run type-check
-      continue-on-error: true
 
   integration:
     name: Integration Tests
@@ -94,7 +91,6 @@ jobs:
       
     - name: Run integration tests
       run: bun test --integration
-      continue-on-error: true
       
     - name: Stop server
       run: pkill -f "bun.*server.ts" || true

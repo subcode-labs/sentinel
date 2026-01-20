@@ -22,7 +22,7 @@ async function requestAccess(resourceId: string) {
     })
   });
 
-  const data = await response.json();
+  const data = (await response.json()) as any;
   console.log(`Status: ${response.status}`);
   console.log('Response:', JSON.stringify(data, null, 2));
   return data;
@@ -44,7 +44,10 @@ async function run() {
     const pollRes = await fetch(`${BASE_URL}${pending.polling_url}`, {
       headers: { 'Authorization': `Bearer ${TOKEN}` }
     });
-    console.log('Poll Response:', JSON.stringify(await pollRes.json(), null, 2));
+    console.log(
+      'Poll Response:',
+      JSON.stringify((await pollRes.json()) as any, null, 2),
+    );
   }
 }
 

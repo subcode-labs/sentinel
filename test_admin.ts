@@ -20,7 +20,7 @@ async function requestAccess(resourceId: string) {
       ttl_seconds: 300
     })
   });
-  const data = await response.json();
+  const data = (await response.json()) as any;
   console.log(`[Client] Status: ${response.status}`);
   return data;
 }
@@ -34,7 +34,7 @@ async function listRequests(status?: string) {
   const response = await fetch(url, {
     headers: { 'Authorization': `Bearer ${TOKEN}` }
   });
-  const data = await response.json();
+  const data = (await response.json()) as any[];
   console.log(`[Admin] Found ${data.length} requests`);
   return data;
 }
@@ -45,7 +45,7 @@ async function approveRequest(requestId: string) {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${TOKEN}` }
   });
-  const data = await response.json();
+  const data = (await response.json()) as any;
   console.log(`[Admin] Approve Response:`, JSON.stringify(data, null, 2));
   return data;
 }
@@ -56,7 +56,7 @@ async function denyRequest(requestId: string) {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${TOKEN}` }
   });
-  const data = await response.json();
+  const data = (await response.json()) as any;
   console.log(`[Admin] Deny Response:`, JSON.stringify(data, null, 2));
   return data;
 }
@@ -66,7 +66,7 @@ async function pollRequest(requestId: string) {
   const response = await fetch(`${BASE_URL}/v1/access/requests/${requestId}`, {
     headers: { 'Authorization': `Bearer ${TOKEN}` }
   });
-  const data = await response.json();
+  const data = (await response.json()) as any;
   console.log(`[Client] Poll Response:`, JSON.stringify(data, null, 2));
   return data;
 }
