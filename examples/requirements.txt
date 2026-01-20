@@ -1,5 +1,7 @@
 langchain
 langchain-openai
 crewai
+semantic-kernel
+llama-index
 # Install the local SDK in editable mode
 -e ../sdks/python
