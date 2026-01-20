@@ -23,7 +23,7 @@ services:
       - HOST=0.0.0.0
       
       # API authentication
-      - SENTINEL_API_TOKEN=sentinel_dev_key
+      - SENTINEL_API_KEY=sentinel_dev_key
       
       # Database location
       - DB_PATH=/app/data/sentinel.db
