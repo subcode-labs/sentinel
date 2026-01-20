@@ -9,9 +9,9 @@
     "dev": "bun --watch src/server.ts",
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "lint": "echo 'Linting not configured yet'",
-    "format": "echo 'Formatting not configured yet'",
-    "type-check": "echo 'Type checking not configured yet'",
+    "lint": "biome check src",
+    "format": "biome check --write src",
+    "type-check": "tsc --noEmit",
     "build": "echo 'Build not required for Bun runtime'"
   },
   "keywords": [
@@ -28,17 +28,19 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/subcode-ventures/sentinel.git"
+    "url": "https://github.com/subcode-labs/sentinel.git"
   },
   "bugs": {
-    "url": "https://github.com/subcode-ventures/sentinel/issues"
+    "url": "https://github.com/subcode-labs/sentinel/issues"
   },
-  "homepage": "https://sentinel.subcode.ventures",
+  "homepage": "https://sentinel.subcode.labs",
   "dependencies": {
     "hono": "latest"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@biomejs/biome": "latest",
+    "typescript": "^5.0.0"
   },
   "engines": {
     "bun": ">=1.0.0"
