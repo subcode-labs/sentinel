@@ -1,0 +1,3 @@
+pydantic-ai
+sentinel-client
+python-dotenv

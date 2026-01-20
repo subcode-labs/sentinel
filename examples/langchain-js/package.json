@@ -1,0 +1,19 @@
+{
+  "name": "sentinel-langchain-js-example",
+  "version": "1.0.0",
+  "description": "Example of integrating Sentinel with LangChain.js",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "dependencies": {
+    "@subcode/sentinel-client": "file:../../sdks/typescript",
+    "langchain": "^0.1.0",
+    "@langchain/core": "^0.1.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.0.0",
+    "typescript": "^5.0.0"
+  }
+}

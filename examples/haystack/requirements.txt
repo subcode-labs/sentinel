@@ -1,0 +1,2 @@
+sentinel-client>=0.1.0
+haystack-ai
