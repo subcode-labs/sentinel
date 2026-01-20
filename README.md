@@ -198,10 +198,18 @@ Customize policies in your deployment to match your security requirements.
 
 See the [`examples/`](./examples) directory for ready-to-use integrations with popular AI agent frameworks:
 
-- **LangChain**: [LangChain + Sentinel Example](./examples/langchain)
+- **Smolagents**: [Smolagents + Sentinel Example](./examples/smolagents)
+- **PydanticAI**: [PydanticAI + Sentinel Example](./examples/pydantic-ai)
+- **Haystack**: [Haystack + Sentinel Example](./examples/haystack)
+- **AutoGen**: [AutoGen + Sentinel Example](./examples/autogen)
 - **CrewAI**: [CrewAI + Sentinel Example](./examples/crewai)
-- **Next.js App Router**: [Next.js + Sentinel Example](./examples/nextjs-app-router)
+- **LlamaIndex**: [LlamaIndex + Sentinel Example](./examples/llamaindex)
+- **Semantic Kernel**: [Semantic Kernel + Sentinel Example](./examples/semantic-kernel)
+- **LangChain**: [LangChain + Sentinel Example](./examples/langchain)
+- **AutoGPT**: [AutoGPT + Sentinel Example](./examples/autogpt)
 - **Vercel AI SDK**: [Vercel AI SDK + Sentinel Example](./examples/vercel-ai-sdk)
+- **Next.js App Router**: [Next.js + Sentinel Example](./examples/nextjs-app-router)
+
 
 ## Contributing
 
@@ -219,6 +227,7 @@ Sentinel is open source software licensed under the [MIT License](LICENSE).
 
 ## Community & Support
 
+- **Feedback**: See [FEEDBACK.md](FEEDBACK.md) for how to report bugs and request features.
 - **Issues**: [GitHub Issues](https://github.com/subcode-labs/sentinel/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/subcode-labs/sentinel/discussions)
 - **Security**: See [SECURITY.md](SECURITY.md) for reporting vulnerabilities
