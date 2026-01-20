@@ -270,8 +270,10 @@ describe("Sentinel Server", () => {
       expect(res.status).toBe(200);
       const secrets = (await res.json()) as any[];
       expect(secrets.length).toBeGreaterThan(0);
-      
-      const resourceSecrets = secrets.filter(s => s.resource_id === "rotatable_resource");
+
+      const resourceSecrets = secrets.filter(
+        (s) => s.resource_id === "rotatable_resource",
+      );
       expect(resourceSecrets.length).toBeGreaterThanOrEqual(2);
     });
   });

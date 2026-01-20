@@ -139,7 +139,9 @@ app.post("/v1/access/request", async (c) => {
           body: JSON.stringify({
             text: `🛡️ **Sentinel Access Request**\n\n**Agent:** ${body.agent_id}\n**Resource:** ${body.resource_id}\n**Intent:** ${body.intent.summary}\n\nApprove: ${process.env.SENTINEL_URL || "http://localhost:3000"}/admin`,
           }),
-        }).catch((e) => console.error("[Webhook] Failed to send notification:", e));
+        }).catch((e) =>
+          console.error("[Webhook] Failed to send notification:", e),
+        );
       }
     } else if (body.resource_id.includes("forbidden")) {
       status = "DENIED";

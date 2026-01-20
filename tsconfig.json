@@ -18,5 +18,10 @@
     "types": [
       "bun-types"
     ]
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "examples",
+    "sdks"
+  ]
 }
