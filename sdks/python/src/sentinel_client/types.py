@@ -18,6 +18,8 @@ class AccessIntent(BaseModel):
 class AccessRequest(BaseModel):
     agent_id: str
     resource_id: str
+    version: Optional[int] = None
+    environment: Optional[str] = None
     intent: AccessIntent
     ttl_seconds: int = Field(..., gt=0)
 
