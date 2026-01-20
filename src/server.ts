@@ -23,6 +23,29 @@ db.run(`
   )
 `);
 
+db.run(`
+  CREATE TABLE IF NOT EXISTS secrets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    resource_id TEXT,
+    version INTEGER,
+    value TEXT,
+    created_at TEXT
+  )
+`);
+
+function getOrCreateSecret(resourceId: string): { value: string; version: number } {
+  const secret = db.query('SELECT * FROM secrets WHERE resource_id = ? ORDER BY version DESC LIMIT 1').get(resourceId) as any;
+  if (secret) {
+    return { value: secret.value, version: secret.version };
+  }
+
+  const value = `secret_v1_${Math.random().toString(36).substring(2)}`;
+  db.prepare('INSERT INTO secrets (resource_id, version, value, created_at) VALUES (?, ?, ?, ?)').run(
+    resourceId, 1, value, new Date().toISOString()
+  );
+  return { value, version: 1 };
+}
+
 // Secret key for dev
 const API_TOKEN = 'sentinel_dev_key';
 
@@ -63,9 +86,10 @@ app.post('/v1/access/request', async (c) => {
       };
     } else {
       // Approved
+      const { value } = getOrCreateSecret(body.resource_id);
       response.secret = {
-        type: 'dummy_secret',
-        value: `super_secret_value_for_${body.resource_id}`,
+        type: 'managed_secret',
+        value: value,
         expires_at: new Date(Date.now() + body.ttl_seconds * 1000).toISOString()
       };
     }
@@ -184,4 +208,25 @@ app.post('/v1/admin/requests/:id/deny', (c) => {
   return c.json(newPayload);
 });
 
-export default app;
+// Rotate secret
+app.post('/v1/admin/secrets/:resource_id/rotate', (c) => {
+  const resourceId = c.req.param('resource_id');
+  const { version } = getOrCreateSecret(resourceId); // Ensure at least v1 exists
+  const newVersion = version + 1;
+  const newValue = `secret_v${newVersion}_${Math.random().toString(36).substring(2)}`;
+
+  db.prepare('INSERT INTO secrets (resource_id, version, value, created_at) VALUES (?, ?, ?, ?)').run(
+      resourceId, newVersion, newValue, new Date().toISOString()
+  );
+
+  return c.json({
+      resource_id: resourceId,
+      version: newVersion,
+      status: 'ROTATED'
+  });
+});
+
+export default {
+  port: parseInt(process.env.PORT || "3000"),
+  fetch: app.fetch,
+};
