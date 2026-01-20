@@ -110,17 +110,22 @@ app.post("/v1/access/request", async (c) => {
       `[AUDIT] Intent: ${body.intent.summary} (${body.intent.task_id})`,
     );
 
-    // 2. Policy Engine (Mock)
+    // 2. Policy Engine (Simple Regex based)
     let status: AccessStatus = "APPROVED";
     let response: AccessResponse = {
       request_id: requestId,
       status: "APPROVED",
     };
 
-    if (
-      body.resource_id.includes("prod") ||
-      body.resource_id.includes("sensitive")
-    ) {
+    const requireApprovalRegex = process.env.SENTINEL_POLICY_REQUIRE_APPROVAL_REGEX 
+      ? new RegExp(process.env.SENTINEL_POLICY_REQUIRE_APPROVAL_REGEX)
+      : /(prod|sensitive)/;
+      
+    const autoDenyRegex = process.env.SENTINEL_POLICY_AUTO_DENY_REGEX
+      ? new RegExp(process.env.SENTINEL_POLICY_AUTO_DENY_REGEX)
+      : /forbidden/;
+
+    if (requireApprovalRegex.test(body.resource_id)) {
       status = "PENDING_APPROVAL";
       response = {
         request_id: requestId,
@@ -133,17 +138,20 @@ app.post("/v1/access/request", async (c) => {
       const webhookUrl = process.env.SENTINEL_WEBHOOK_URL;
       if (webhookUrl) {
         // Fire and forget - don't block the response
+        const message = `🛡️ **Sentinel Access Request**\n\n**Agent:** ${body.agent_id}\n**Resource:** ${body.resource_id}\n**Intent:** ${body.intent.summary}\n\nApprove: ${process.env.SENTINEL_URL || "http://localhost:3000"}/admin`;
+
         fetch(webhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            text: `🛡️ **Sentinel Access Request**\n\n**Agent:** ${body.agent_id}\n**Resource:** ${body.resource_id}\n**Intent:** ${body.intent.summary}\n\nApprove: ${process.env.SENTINEL_URL || "http://localhost:3000"}/admin`,
+            content: message, // Discord
+            text: message, // Slack
           }),
         }).catch((e) =>
           console.error("[Webhook] Failed to send notification:", e),
         );
       }
-    } else if (body.resource_id.includes("forbidden")) {
+    } else if (autoDenyRegex.test(body.resource_id)) {
       status = "DENIED";
       response = {
         request_id: requestId,
@@ -198,6 +206,31 @@ app.get("/v1/access/requests/:id", (c) => {
   return c.json(JSON.parse(record.response));
 });
 
+// Fetch all latest secrets (Environment Injection)
+app.get("/v1/secrets", (c) => {
+  // 1. Get all secrets
+  const secrets = db
+    .query("SELECT * FROM secrets ORDER BY resource_id ASC, version ASC")
+    .all() as any[];
+
+  // 2. Reduce to latest version per resource_id
+  const latestSecrets: Record<string, string> = {};
+  for (const secret of secrets) {
+    latestSecrets[secret.resource_id] = secret.value;
+  }
+
+  return c.json(latestSecrets);
+});
+
+// List available resources (Discovery)
+app.get("/v1/resources", (c) => {
+  const secrets = db
+    .query("SELECT DISTINCT resource_id FROM secrets ORDER BY resource_id ASC")
+    .all() as any[];
+
+  return c.json(secrets.map((s) => s.resource_id));
+});
+
 // --- Admin API ---
 
 // List all requests
@@ -244,6 +277,9 @@ app.post("/v1/admin/requests/:id/approve", (c) => {
   const _response = JSON.parse(record.response);
   const resourceId = record.resource_id;
 
+  // Get the real secret value
+  const { value } = getOrCreateSecret(resourceId);
+
   // Update logic
   const newStatus = "APPROVED";
   // Standard TTL for admin approval: 1 hour (mock)
@@ -253,8 +289,8 @@ app.post("/v1/admin/requests/:id/approve", (c) => {
     request_id: id,
     status: newStatus,
     secret: {
-      type: "dummy_secret",
-      value: `super_secret_value_for_${resourceId}`,
+      type: "managed_secret",
+      value: value,
       expires_at: expiresAt,
     },
   };

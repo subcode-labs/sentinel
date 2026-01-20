@@ -277,4 +277,29 @@ describe("Sentinel Server", () => {
       expect(resourceSecrets.length).toBeGreaterThanOrEqual(2);
     });
   });
+
+  describe("Discovery", () => {
+    it("should list available resources", async () => {
+      // Create a secret first by requesting it (which triggers auto-creation in this mock)
+      await app.request("/v1/access/request", {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({
+          agent_id: "test",
+          resource_id: "discovery_resource",
+          intent: { summary: "test", description: "test", task_id: "1" },
+          ttl_seconds: 3600,
+        }),
+      });
+
+      const res = await app.request("/v1/resources", {
+        headers: authHeaders,
+      });
+
+      expect(res.status).toBe(200);
+      const resources = (await res.json()) as string[];
+      expect(Array.isArray(resources)).toBe(true);
+      expect(resources).toContain("discovery_resource");
+    });
+  });
 });
