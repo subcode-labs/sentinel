@@ -7,6 +7,8 @@ export interface AccessIntent {
 export interface AccessRequest {
   agent_id: string;
   resource_id: string;
+  version?: number;
+  environment?: string;
   intent: AccessIntent;
   ttl_seconds: number;
 }
@@ -58,6 +60,8 @@ export interface SentinelClientConfig {
 
 export interface RequestSecretOptions {
   resourceId: string;
+  version?: number;
+  environment?: string;
   intent: AccessIntent;
   ttlSeconds?: number;
 }

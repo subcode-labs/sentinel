@@ -1,6 +1,6 @@
 {
   "name": "@subcode/sentinel-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Official TypeScript Client for Sentinel - Secure Secret Management for AI Agents",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

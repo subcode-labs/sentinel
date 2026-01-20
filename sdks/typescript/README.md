@@ -64,3 +64,12 @@ async function main() {
   }
 }
 ```
+
+### Discover Resources
+
+List available resource IDs that you can request.
+
+```typescript
+const resources = await client.listResources();
+console.log("Available resources:", resources);
+```

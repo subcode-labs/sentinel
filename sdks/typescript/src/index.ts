@@ -114,15 +114,73 @@ export class SentinelClient {
   }
 
   /**
+   * List all available resource IDs that can be requested.
+   *
+   * Endpoint:
+   * - GET {baseUrl}/v1/resources
+   */
+  async listResources(options: { environment?: string } = {}): Promise<string[]> {
+    const environment = options.environment ?? this.environment;
+    const url = new URL("/v1/resources", this.baseUrl);
+    // Sentinel Cloud expects 'environment' param (defaulting to production if omitted)
+    if (environment) {
+      url.searchParams.set("environment", environment);
+    }
+
+    try {
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${this.apiToken}`,
+        },
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        const errorText = await response.text().catch(() => "Unauthorized");
+        throw new SentinelAuthError(
+          `Unauthorized (status ${response.status}): ${errorText}`,
+        );
+      }
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => "Unknown error");
+        throw new SentinelError(
+          `Failed to list resources: ${response.status} ${errorText}`,
+        );
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        throw new SentinelError("Invalid response: expected array of strings");
+      }
+
+      return data as string[];
+    } catch (error) {
+      if (error instanceof SentinelError) {
+        throw error;
+      }
+      throw new SentinelNetworkError(
+        `Failed to list resources from ${this.baseUrl}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        error,
+      );
+    }
+  }
+
+  /**
    * Local / self-hosted mode: request access to a secret with intent logging.
    * Returns the immediate response without polling for PENDING_APPROVAL status.
    */
   async requestSecret(options: RequestSecretOptions): Promise<AccessResponse> {
-    const { resourceId, intent, ttlSeconds = 3600 } = options;
+    const { resourceId, intent, ttlSeconds = 3600, version, environment } = options;
 
     const payload: AccessRequest = {
       agent_id: this.agentId,
       resource_id: resourceId,
+      version,
+      environment: environment ?? this.environment,
       intent,
       ttl_seconds: ttlSeconds,
     };
