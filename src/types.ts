@@ -17,7 +17,7 @@ export interface SecretPayload {
   expires_at: string;
 }
 
-export type AccessStatus = 'APPROVED' | 'PENDING_APPROVAL' | 'DENIED';
+export type AccessStatus = "APPROVED" | "PENDING_APPROVAL" | "DENIED";
 
 export interface AccessResponse {
   request_id: string;
