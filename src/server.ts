@@ -7,7 +7,10 @@ import type { AccessRequest, AccessResponse, AccessStatus } from "./types";
 const app = new Hono();
 
 // Persistence: SQLite
-const dbPath = join(import.meta.dir, "../sentinel.db");
+const dbPath =
+  process.env.NODE_ENV === "test"
+    ? ":memory:"
+    : join(import.meta.dir, "../sentinel.db");
 const db = new Database(dbPath);
 
 // Initialize schema
@@ -265,6 +268,8 @@ app.post("/v1/admin/secrets/:resource_id/rotate", (c) => {
     status: "ROTATED",
   });
 });
+
+export { app };
 
 export default {
   port: parseInt(process.env.PORT || "3000", 10),
