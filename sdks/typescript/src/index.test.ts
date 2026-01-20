@@ -10,7 +10,7 @@ describe("SentinelClient", () => {
 
   test("listResources returns array of strings", async () => {
     const mockFetch = mock(async (url) => {
-      if (url.toString().endsWith("/v1/resources")) {
+      if (url.toString().includes("/v1/resources")) {
         return new Response(JSON.stringify(["res1", "res2"]), {
           status: 200,
         });

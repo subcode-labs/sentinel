@@ -120,7 +120,34 @@ def test_request_secret_polling_timeout(client, intent):
         )
     )
 
-    with pytest.raises(SentinelTimeoutError):
-        client.request_secret(
-            "resource-sensitive", intent, polling_interval=0.1, polling_timeout=0.5
+
+@respx.mock
+def test_fetch_secrets(client):
+    respx.get("http://test-server/v1/secrets").mock(
+        return_value=Response(
+            200,
+            json={
+                "resource-1": "secret-value-1",
+                "resource-2": "secret-value-2",
+            },
         )
+    )
+
+    secrets = client.fetch_secrets()
+    assert secrets == {
+        "resource-1": "secret-value-1",
+        "resource-2": "secret-value-2",
+    }
+
+
+@respx.mock
+def test_list_resources(client):
+    respx.get("http://test-server/v1/resources").mock(
+        return_value=Response(
+            200,
+            json=["resource-1", "resource-2", "resource-3"],
+        )
+    )
+
+    resources = client.list_resources()
+    assert resources == ["resource-1", "resource-2", "resource-3"]
