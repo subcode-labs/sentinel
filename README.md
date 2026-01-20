@@ -206,6 +206,7 @@ See the [`examples/`](./examples) directory for ready-to-use integrations with p
 - **LlamaIndex**: [LlamaIndex + Sentinel Example](./examples/llamaindex)
 - **Semantic Kernel**: [Semantic Kernel + Sentinel Example](./examples/semantic-kernel)
 - **LangChain**: [LangChain + Sentinel Example](./examples/langchain)
+- **LangGraph**: [LangGraph + Sentinel Example](./examples/langgraph)
 - **AutoGPT**: [AutoGPT + Sentinel Example](./examples/autogpt)
 - **Vercel AI SDK**: [Vercel AI SDK + Sentinel Example](./examples/vercel-ai-sdk)
 - **Next.js App Router**: [Next.js + Sentinel Example](./examples/nextjs-app-router)

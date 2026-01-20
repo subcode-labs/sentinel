@@ -117,10 +117,11 @@ app.post("/v1/access/request", async (c) => {
       status: "APPROVED",
     };
 
-    const requireApprovalRegex = process.env.SENTINEL_POLICY_REQUIRE_APPROVAL_REGEX 
+    const requireApprovalRegex = process.env
+      .SENTINEL_POLICY_REQUIRE_APPROVAL_REGEX
       ? new RegExp(process.env.SENTINEL_POLICY_REQUIRE_APPROVAL_REGEX)
       : /(prod|sensitive)/;
-      
+
     const autoDenyRegex = process.env.SENTINEL_POLICY_AUTO_DENY_REGEX
       ? new RegExp(process.env.SENTINEL_POLICY_AUTO_DENY_REGEX)
       : /forbidden/;
